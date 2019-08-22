@@ -1,0 +1,86 @@
+# Function to get the most recent rental of (2018-2019)
+# Returns a list of id's & associated geo data
+def getRecentLocation(main_data, year):
+    
+    output = []
+    maxLen = len(main_data["last_review"])
+    
+    for x in range(maxLen):
+        
+        #Check if date_str is not NULL object, if NULL continue
+        if isinstance(main_data["last_review"][x], str) != True: 
+            continue
+        
+        if compareDates(main_data["last_review"][x], year) == 1:
+            new_dict = {
+                "id" : main_data["id"][x],
+                "geometry" : main_data["geometry"][x],
+                "date" : main_data["last_review"][x]
+            }
+            output.append(new_dict)
+            
+    return output
+        
+
+# Function to check if given date is within the different holiday dates (Long holidays)
+# If within the holiday dates return 1, else return 0
+def compareDates(date_str, year):
+    
+    # Converts string into date type
+    new_date = datetime.strptime(date_str, "%Y-%m-%d")
+    
+    # Calls a function to create holidays start and end dates
+    # hlist[0] returns list of holidays start date & hlist[1] returns list of holidays 
+    # end date
+    hlist = createHolidays(year)
+    
+    holiday_start = hlist[0]
+    holiday_end = hlist[1]
+    
+    # If statements with all the different holiday dates
+    for i in range(len(holiday_start)):
+        
+        if new_date >= holiday_start[i] and new_date <= holiday_end[i]:
+            return 1
+
+    return 0
+
+
+# Function to create a list of holidays
+def createHolidays(year):
+    
+    # Main List to return, stores two list 
+    res = [] 
+    
+    holiday_start = []
+    holiday_end = []
+    
+    # Setup for different holidays
+    t1_start = datetime(year, 4, 13)
+    holiday_start.append(t1_start)
+    
+    t1_end = datetime(year, 4, 28)
+    holiday_end.append(t1_end)
+    
+    t2_start = datetime(year, 7, 6)
+    holiday_start.append(t2_start)
+    
+    t2_end = datetime(year, 7, 21)
+    holiday_end.append(t2_end)
+    
+    t3_start = datetime(year, 9, 28)
+    holiday_start.append(t3_start)
+    
+    t3_end = datetime(year, 10, 13)
+    holiday_end.append(t3_end)
+    
+    t4_start = datetime(year, 12, 19)
+    holiday_start.append(t4_start)
+    
+    t4_end = datetime(year+1, 2, 2) # Special case for the one to read the next year
+    holiday_end.append(t4_end)
+    
+    res.append(holiday_start)
+    res.append(holiday_end)
+    
+    return res
